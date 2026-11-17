@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="description" content="Diário inteligente de treinamento">
+<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="styles.css">
+<title>Fit Tracker</title>
+</head>
+<body>
+<header class="topbar"><div class="brand"><span class="brandmark">FT</span><div><strong>FIT TRACKER</strong><small>Seu diário de treinamento</small></div></div><span id="cloudStatus" class="pill">Não conectado</span></header>
+<main>
+<section id="authPanel" class="panel auth">
+  <h1>Seu treino. Sua evolução.</h1><p>Entre para sincronizar seus registros na nuvem.</p>
+  <label>E-mail<input id="email" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+  <label>Senha<input id="password" type="password" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></label>
+  <div class="actions"><button id="signIn">Entrar</button><button id="signUp" class="secondary">Criar conta</button></div>
+  <p id="authMessage" class="muted small">Configure o Supabase para habilitar sua conta e a sincronização.</p>
+</section>
+<section id="appPanel" hidden>
+<nav class="tabs">
+<button class="tab active" data-tab="home">Início</button><button class="tab" data-tab="strength">Musculação</button><button class="tab" data-tab="run">Corrida</button><button class="tab" data-tab="history">Histórico</button><button class="tab" data-tab="analytics">Análises</button><button class="tab" data-tab="pain">Desconfortos</button><button class="tab" data-tab="library">Exercícios</button>
+</nav>
+<section id="home" class="view">
+  <div class="hero"><div><span class="eyebrow">PAINEL PESSOAL</span><h1>Vamos evoluir.</h1><p>Registre com consistência. Compare com inteligência.</p></div><div class="heroicon">↗</div></div>
+  <div class="grid four"><article class="stat"><span>Sessões de musculação</span><strong id="statWorkouts">0</strong></article><article class="stat"><span>Séries registradas</span><strong id="statSets">0</strong></article><article class="stat"><span>Corridas</span><strong id="statRuns">0</strong></article><article class="stat"><span>Km corridos</span><strong id="statKm">0</strong></article></div>
+  <article class="panel"><h2>Começar agora</h2><div class="actions"><button data-go="strength">＋ Registrar musculação</button><button class="secondary" data-go="run">＋ Registrar corrida</button></div></article>
+  <article class="panel coach-panel"><div class="coach-title"><span>✦</span><div><h2>Leitura do seu treino</h2><small>Comentários automáticos baseados nos seus registros</small></div></div><p id="coachInsight" class="coach-copy">Assim que você registrar suas atividades, vou destacar tendências e pequenas conquistas.</p></article><article class="panel"><div class="sectionhead compact"><h2>Últimos registros</h2><button class="textbutton" data-go="history">Ver histórico →</button></div><div id="recent" class="stack muted">Seus registros aparecerão aqui.</div></article>
+  <article class="panel"><h2>Nota de treino</h2><p class="muted">A estimativa de 1RM é uma referência matemática, não substitui um teste supervisionado. RIR e RPE são percepções subjetivas; registre com consistência.</p></article>
+</section>
+<section id="strength" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">MODO TREINO</span><h1>Musculação</h1></div><span class="pill" id="sessionStatus">Sessão não iniciada</span></div>
+  <article class="panel">
+    <label>Nome do treino<input id="sessionName" placeholder="Ex.: PUSH, PULL, LEGS"></label>
+    <label>Exercício<select id="exerciseSelect"></select></label>
+    <div class="last-performance" id="lastPerformance">Selecione um exercício para ver seu último desempenho.</div>
+    <div class="grid two">
+      <label>Tipo de série<select id="setType"><option value="working">Série válida</option><option value="warmup">Preparatória / aquecimento</option><option value="intensification">Intensificação</option></select></label>
+      <label>Meta de repetições<input id="targetReps" value="8–10" placeholder="Ex.: 8–10"></label>
+    </div>
+    <div class="grid two"><label>Carga (kg)<input id="load" type="number" min="0" step="0.25" inputmode="decimal" placeholder="Ex.: 35"></label><label>Repetições feitas<input id="reps" type="number" min="1" step="1" inputmode="numeric" placeholder="Ex.: 10"></label></div>
+    <div class="grid two"><label>RIR<select id="rir"><option value="">Não informado</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label><label>RPE<select id="rpe"><option value="">Não informado</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label></div>
+    <details class="advanced-fields"><summary>Progressão, descanso e observações</summary>
+      <div class="grid two">
+        <label>Descanso entre séries<select id="restSeconds"><option value="60">1:00</option><option value="90">1:30</option><option value="120" selected>2:00</option><option value="150">2:30</option><option value="180">3:00</option><option value="240">4:00</option><option value="300">5:00</option></select></label>
+        <label>Transição entre exercícios<select id="transitionSeconds"><option value="30">0:30</option><option value="60">1:00</option><option value="90" selected>1:30</option><option value="120">2:00</option><option value="150">2:30</option><option value="180">3:00</option></select></label>
+      </div>
+      <label>Estratégia de progressão<select id="progressionStrategy"><option value="double">Progressão dupla (reps e depois carga)</option><option value="load">Priorizar carga</option><option value="reps">Priorizar repetições</option><option value="technique">Priorizar técnica e controle</option><option value="density">Densidade (tempo/descanso)</option><option value="free">Livre / definida pelo personal</option></select></label>
+      <label>Técnica de intensificação<select id="technique"><option value="">Nenhuma</option><option>Drop set</option><option>Rest-pause</option><option>Myo-reps</option><option>Bi-set</option><option>Tri-set</option><option>Cluster set</option><option>Giant set</option><option>Repetições parciais</option><option>Isometria</option><option>Tempo controlado</option><option>Pré-exaustão</option><option>Outra</option></select></label>
+      <label>Detalhes da técnica / execução<textarea id="techniqueNotes" rows="2" placeholder="Ex.: série principal + duas reduções de carga..."></textarea></label>
+      <label>Observação breve<textarea id="setNotes" rows="2" placeholder="Amplitude, controle, desconforto, sensação..."></textarea></label>
+    </details>
+    <div class="estimate"><span>1RM estimado (Epley)</span><strong id="oneRm">—</strong><small id="estimateNote">Informe carga e repetições para calcular. Estimativa não é teste máximo.</small></div>
+    <button id="saveSet" class="full primary-large">Salvar série e iniciar descanso</button>
+  </article>
+  <article class="panel timer-panel" id="timerPanel">
+    <div class="timer-head"><div><span class="eyebrow">CRONÔMETRO</span><h2 id="timerLabel">Pronto para descansar?</h2></div><span class="timer-state" id="timerState">Parado</span></div>
+    <div class="timer-display" id="timerDisplay" aria-live="polite">02:00</div>
+    <p id="timerHint" class="muted small">Ao salvar uma série, o descanso entre séries começa automaticamente.</p>
+    <div class="timer-actions"><button id="timerStart">Iniciar</button><button id="timerPause" class="secondary" disabled>Pausar</button><button id="timerReset" class="secondary">Reiniciar</button><button id="timerSkip" class="textbutton">Pular</button></div>
+    <button id="startTransition" class="secondary full">Iniciar descanso entre exercícios</button><button id="wakeLockButton" class="textbutton full">Manter tela ligada durante o treino</button><p id="wakeLockStatus" class="muted small">Disponível em navegadores compatíveis e em HTTPS.</p>
+  </article>
+  <article class="panel"><h2>Feedback da série</h2><p id="strengthFeedback" class="muted">Depois de salvar, você verá um comentário sobre o registro e seu histórico.</p></article>
+  <article class="panel"><div class="sectionhead compact"><h2>Séries desta sessão</h2><span class="tag" id="sessionSetCount">0 séries</span></div><div id="sessionSets" class="stack muted">Nenhuma série registrada nesta sessão.</div><button id="finishSession" class="secondary full" disabled>Finalizar sessão</button></article>
+</section>
+<section id="run" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">ATIVIDADE AERÓBICA</span><h1>Corrida</h1></div></div>
+  <article class="panel">
+    <label>Tipo de corrida<select id="runType"><option>Leve</option><option>Contínua</option><option>Longão</option><option>Intervalado</option><option>Tempo run</option><option>Esteira</option><option>Caminhada</option><option>Outro</option></select></label>
+    <div class="grid two"><label>Distância (km)<input id="distance" type="number" min="0" step="0.01" placeholder="Ex.: 5"></label><label>Tempo (minutos)<input id="duration" type="number" min="0" step="0.1" placeholder="Ex.: 30"></label></div>
+    <div class="grid two"><label>FC média (bpm)<input id="hr" type="number" min="0" placeholder="Opcional"></label><label>RPE da sessão<select id="runRpe"><option value="">Não informado</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label></div>
+    <div class="estimate"><span>Ritmo médio</span><strong id="pace">—</strong><small>min/km</small></div>
+    <label>Observações<textarea id="runNotes" rows="2" placeholder="Percurso, sensação, clima..."></textarea></label>
+    <button id="saveRun" class="full">Salvar corrida</button>
+  </article>
+  <article class="panel"><h2>Feedback da corrida</h2><p id="runFeedback" class="muted">Após salvar, você verá um comentário sobre ritmo, distância e histórico.</p>
+  </article>
+</section>
+<section id="history" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">SEU PROGRESSO</span><h1>Histórico</h1></div><button id="refresh" class="secondary">Atualizar</button></div>
+  <article class="panel"><label>Filtrar histórico<input id="historySearch" placeholder="Buscar exercício, treino ou observação..."></label><div class="history-meta" id="historyCount"></div></article><article class="panel"><h2>Registros de musculação</h2><div id="strengthHistory" class="stack muted">Sem registros.</div></article>
+  <article class="panel"><h2>Corridas</h2><div id="runHistory" class="stack muted">Sem registros.</div></article>
+  <article class="panel"><h2>Desconfortos registrados</h2><div id="painHistory" class="stack muted">Sem registros.</div></article>
+</section>
+<section id="analytics" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">DADOS E TENDÊNCIAS</span><h1>Análises</h1></div></div>
+  <div class="grid two"><article class="stat"><span>Volume registrado* (últimos 7 dias)</span><strong id="weeklyVolume">0 kg</strong><small>*Carga × repetições, não tonelagem fisiológica perfeita.</small></article><article class="stat"><span>Distância corrida (últimos 7 dias)</span><strong id="weeklyDistance">0 km</strong><small id="weeklySessions">0 sessões de musculação</small></article></div>
+  <article class="panel"><div class="sectionhead compact"><div><h2>Progressão por exercício</h2><small class="muted">Acompanhe carga e 1RM estimado ao longo dos registros.</small></div></div><label>Exercício<select id="chartExercise"></select></label><div id="strengthChart" class="chart-wrap"><p class="muted">Registre séries para visualizar sua evolução.</p></div><div class="legend"><span><i class="legend-dot purple"></i> Carga utilizada</span><span><i class="legend-dot green"></i> 1RM estimado</span></div></article>
+  <article class="panel"><h2>Volume por grupo muscular</h2><p class="muted small">Soma de carga × repetições dos últimos 7 dias, agrupada pelo músculo principal registrado.</p><div id="muscleChart" class="bar-list"></div></article>
+  <article class="panel"><h2>Ritmo das corridas</h2><div id="runChart" class="run-chart"></div><p class="muted small">Menor ritmo em min/km significa maior velocidade. Compare percursos e condições semelhantes.</p></article>
+</section>
+<section id="library" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">CATÁLOGO</span><h1>Exercícios</h1></div></div>
+  <article class="panel"><input id="exerciseSearch" placeholder="Buscar exercício ou músculo..."><div id="exerciseList" class="stack"></div></article>
+  <article class="panel"><h2>Cadastrar exercício</h2>
+    <label>Nome<input id="customName" placeholder="Nome do exercício"></label>
+    <div class="grid two"><label>Grupo muscular<input id="customMuscle" placeholder="Ex.: Peitoral"></label><label>Equipamento<input id="customEquipment" placeholder="Ex.: Halteres"></label></div>
+    <label>Padrão de movimento<input id="customPattern" placeholder="Ex.: Empurrar horizontal"></label>
+    <button id="addExercise" class="secondary full">Adicionar à minha biblioteca</button>
+  </article>
+</section>
+<section id="pain" class="view" hidden>
+  <div class="sectionhead"><div><span class="eyebrow">BEM-ESTAR</span><h1>Desconfortos</h1></div></div>
+  <article class="panel">
+    <label>Região do corpo<select id="painArea"><option>Ombro</option><option>Cotovelo</option><option>Punho</option><option>Pescoço</option><option>Coluna</option><option>Peitoral</option><option>Quadril</option><option>Joelho</option><option>Tornozelo</option><option>Panturrilha</option><option>Outra</option></select></label>
+    <div class="grid two"><label>Lado<select id="painSide"><option>Não se aplica</option><option>Direito</option><option>Esquerdo</option><option>Ambos</option></select></label><label>Intensidade (0–10)<input id="painIntensity" type="number" min="0" max="10" value="1"></label></div>
+    <label>Quando ocorre?<select id="painWhen"><option>Durante o exercício</option><option>Após o treino</option><option>Em repouso</option><option>Durante atividades diárias</option></select></label>
+    <label>Exercício relacionado<input id="painExercise" placeholder="Opcional"></label>
+    <label>Descrição<textarea id="painDescription" rows="3" placeholder="Descreva o que sente, quando começou e se limita movimentos."></textarea></label>
+    <button id="savePain" class="full">Salvar registro</button>
+  </article>
+</section>
+</section>
+</main>
+<footer><span>FIT TRACKER v0.3 · Modo treino</span><div><button id="helpButton" class="textbutton">Tutorial e ajuda</button><button id="signOut" class="textbutton" hidden>Sair</button></div></footer>
+<div id="tutorial" class="modal-backdrop" hidden><section class="modal panel" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div class="modal-head"><span class="eyebrow">GUIA RÁPIDO</span><button id="closeTutorial" class="textbutton" aria-label="Fechar">✕</button></div><div id="tutorialContent"></div><div class="modal-actions"><button id="tutorialBack" class="secondary">Voltar</button><span id="tutorialStep" class="muted small"></span><button id="tutorialNext">Próximo</button></div></section></div>
+<div id="toast" role="status" class="toast" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="app.js"></script>
+</body></html>

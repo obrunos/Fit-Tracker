@@ -1,0 +1,10 @@
+{
+  "name": "Fit Tracker - Diário de Treinamento",
+  "short_name": "Fit Tracker",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0e1118",
+  "theme_color": "#10131b",
+  "description": "Registro e análise pessoal de treinamento",
+  "icons": []
+}
